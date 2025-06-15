@@ -5,8 +5,8 @@ DIAGRAM_DIR = Path("diagrams")
 OUT_DIR = Path("rendered")
 OUT_DIR.mkdir(exist_ok=True)
 
-# Optional: enable SVG conversion
-ENABLE_SVG = False  # Set to True to enable
+ENABLE_SVG = False
+ENABLE_PNG = True 
 
 for tex_file in DIAGRAM_DIR.glob("*.tex"):
     pdf_name = OUT_DIR / tex_file.with_suffix(".pdf").name
@@ -47,3 +47,20 @@ for tex_file in DIAGRAM_DIR.glob("*.tex"):
             print(f"[OK] SVG created: {svg_name.name}")
         except Exception as e:
             print(f"[!] SVG conversion failed for {pdf_name.name}: {e}")
+
+    if ENABLE_PNG:
+        png_name = pdf_name.with_suffix(".png")
+        try:
+            subprocess.run(
+                [
+                    "convert", "-density", "300",
+                    pdf_name.as_posix(),
+                    "-quality", "100",
+                    png_name.as_posix()
+                ],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            print(f"[OK] PNG created: {png_name.name}")
+        except Exception as e:
+            print(f"[!] PNG conversion failed for {pdf_name.name}: {e}")
